@@ -1,0 +1,59 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: |
+  Bookstore Web API Application aims to create a bookstore web service using Docker 
+  to give students the understanding to dockerization of an application. 
+  The application code is to be deployed as a RESTful web service with 
+  Flask using Dockerfile and Docker Compose on AWS Elastic Compute Cloud (EC2) Instance 
+  using AWS Cloudformation Service.  
+Resources:
+  WebServerSecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: Enable HTTP for Web Server #required
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: My First Security Group
+  WebServerHost:
+    Type: "AWS::EC2::Instance"
+    Properties:
+      ImageId: ami-0c94855ba95c71c99
+      InstanceType: t2.micro
+      KeyName: key
+      SecurityGroupIds:
+        - !Ref WebServerSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub Web Server of {AWS::StackName} Stack
+      UserData:
+        Fn::Base64:
+          !Sub |
+            #! /bin/bash
+            yum update -y
+            wget https:https://raw.githubusercontent.com/hkn-asln/hkclarusway-aws-devops-workshop/master/devops/projects/201-dockerization-bookstore-api-on-python-flask-mysql/Dockerfile -P /home/ec2-user
+            wget https:https://raw.githubusercontent.com/hkn-asln/hkclarusway-aws-devops-workshop/master/devops/projects/201-dockerization-bookstore-api-on-python-flask-mysql/bookstore-api.py -P /home/ec2-user
+            wget https:https://raw.githubusercontent.com/hkn-asln/hkclarusway-aws-devops-workshop/master/devops/projects/201-dockerization-bookstore-api-on-python-flask-mysql/docker-compose.yml -P /home/ec2-user
+            wget https://raw.githubusercontent.com/hkn-asln/hkclarusway-aws-devops-workshop/master/devops/projects/201-dockerization-bookstore-api-on-python-flask-mysql/requirements.txt -P /home/ec2-user
+            amazon-linux-extras install docker
+            service docker start
+            usermod -a -G docker ec2-user
+            curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+            chmod +x /usr/local/bin/docker-compose           
+            ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+            cd /home/ec2-user
+            docker-compose up
+Outputs:
+  WebsiteURL:
+    Value: !Sub 
+      - http://${PublicAddress}
+      - PublicAddress: !GetAtt WebServerHost.PublicDnsName
+    Description: BookStore Web API
