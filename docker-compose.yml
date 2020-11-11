@@ -5,9 +5,9 @@ services:
     image: mysql
     environment:
       MYSQL_DATABASE: bookstore_db
-      MYSQL_USER: clarusway
-      MYSQL_PASSWORD: Clarusway_1
-      MYSQL_ROOT_PASSWORD: Clarusway_1
+      MYSQL_USER: flovearth
+      MYSQL_PASSWORD: fLoveARTh
+      MYSQL_ROOT_PASSWORD: fLoveARTh
     networks:
       - webnet
 
