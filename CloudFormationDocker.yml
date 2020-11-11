@@ -58,5 +58,5 @@ Outputs:
   WebsiteURL:
     Value: !Sub 
       - http://${PublicAddress}
-      - PublicAddress: !GetAtt WebServerHost.PublicDnsName
+      - PublicAddress: !GetAtt MyWebServer.PublicDnsName
     Description: BookStore Web API
