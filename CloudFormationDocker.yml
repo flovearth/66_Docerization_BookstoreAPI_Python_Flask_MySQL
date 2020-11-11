@@ -7,6 +7,11 @@ Description: |
   Flask using Dockerfile and Docker Compose on AWS Elastic Compute Cloud (EC2) Instance 
   using AWS Cloudformation Service.  
 
+Parameters:
+  paramname:
+    Description: Enter key name
+    Type: AWS::EC2::KeyPair::KeyName
+
 Resources:
   WebServerSecurityGroup:
     Type: "AWS::EC2::SecurityGroup"
@@ -32,31 +37,33 @@ Resources:
       InstanceType: t2.micro
       KeyName: 20200824
       SecurityGroupIds:
-        - !Ref WebServerSecurityGroup
+        - !GetAtt WebServerSecurityGroup.GroupId
       Tags:
         - Key: Name
-          Value: !Sub My Web Server of {AWS::StackName} Stack
+          Value: !Sub My Web Server of ${AWS::StackName} Stack
       UserData:
         Fn::Base64:
           !Sub |
             #! /bin/bash
             yum update -y
-            FOLDER="https://raw.githubusercontent.com/flovearth/66_Docerization_BookstoreAPI_Python_Flask_MySQL/main/"
+            FOLDER="https://$TOKEN@raw.githubusercontent.com/flovearth/66_Docerization_BookstoreAPI_Python_Flask_MySQL/main/"
+            TOKEN="6455ace4662a9ed96784b956e69fa520df4d4088"
             wget "$FOLDER"Dockerfile -P /home/ec2-user
             wget "$FOLDER"bookstore-api.py -P /home/ec2-user
             wget "$FOLDER"docker-compose.yml -P /home/ec2-user
             wget "$FOLDER"requirements.txt -P /home/ec2-user
             amazon-linux-extras install docker
-            service docker start
+            systemctl start docker
+            systemctl enable docker
             usermod -a -G docker ec2-user
-            curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+            sudo curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
             chmod +x /usr/local/bin/docker-compose           
-            ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
             cd /home/ec2-user
-            docker-compose up
+            docker build -t "app/my-api:latest" .
+            docker-compose up -d
 Outputs:
   WebsiteURL:
+    Description: BookStore Web API URL
     Value: !Sub 
       - http://${PublicAddress}
       - PublicAddress: !GetAtt MyWebServer.PublicDnsName
-    Description: BookStore Web API
