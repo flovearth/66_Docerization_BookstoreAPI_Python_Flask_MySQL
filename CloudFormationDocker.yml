@@ -47,7 +47,7 @@ Resources:
             #! /bin/bash
             yum update -y
             FOLDER="https://$TOKEN@raw.githubusercontent.com/flovearth/66_Docerization_BookstoreAPI_Python_Flask_MySQL/main/"
-            TOKEN="6455ace4662a9ed96784b956e69fa520df4d4088"
+            TOKEN="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxX"
             wget "$FOLDER"Dockerfile -P /home/ec2-user
             wget "$FOLDER"bookstore-api.py -P /home/ec2-user
             wget "$FOLDER"docker-compose.yml -P /home/ec2-user
