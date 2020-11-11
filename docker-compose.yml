@@ -13,7 +13,7 @@ services:
       - webnet
 
   DockerWebServer:
-    image: app/my-api:latest
+    image: my-api:latest
     depends_on:
       - DockerDB
     ports:
